@@ -35,4 +35,7 @@ public class BookService {
         return bookRepository.findBookByCustomer_CustomerId(customer_id);
     }
 
+    public Integer assignCustomer(Integer bookId, Integer customerId){
+        return bookRepository.assignCustomer(bookId,customerId);
+    }
 }

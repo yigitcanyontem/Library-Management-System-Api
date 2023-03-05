@@ -22,7 +22,6 @@ public class Book {
     @Column(name = "publication_date")
     private Date publicationDate;
 
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id")
     private Customer customer;
