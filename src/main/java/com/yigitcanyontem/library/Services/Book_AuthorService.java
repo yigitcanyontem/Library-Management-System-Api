@@ -7,6 +7,7 @@ import com.yigitcanyontem.library.Repository.Book_AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -14,7 +15,7 @@ public class Book_AuthorService {
     @Autowired
     private Book_AuthorRepository bookAuthorRepository;
 
-    public Optional<Book_Author> singleAuthor(Integer bookId){
+    public Optional<List<Book_Author>> singleAuthor(Integer bookId){
         return bookAuthorRepository.findAuthorByBook_BookId(bookId);
     }
 }

@@ -31,7 +31,7 @@ public class LibraryController {
     @GetMapping("/books/id/{bookId}")
     public ResponseEntity<List<DTO>> getSingleBookById(@PathVariable Integer bookId){
         Optional<Book> book = bookService.singleBookById(bookId);
-        Optional<Author> author = authorService.singleAuthor(bookAuthorService.singleAuthor(bookId).get().getAuthorId());
+        Optional<Author> author = authorService.singleAuthor(bookAuthorService.singleAuthor(bookId).get().get(0).getAuthorId());
 
         DTO dto = new DTO();
         dto.setBook(book);
@@ -43,7 +43,7 @@ public class LibraryController {
     @GetMapping("/books/isbn/{isbn13}")
     public ResponseEntity<List<DTO>> getSingleBookByISBN(@PathVariable String isbn13){
         Optional<Book> book = bookService.singleBookByISBN(isbn13);
-        Optional<Author> author = authorService.singleAuthor(bookAuthorService.singleAuthor(bookService.singleBookByISBN(isbn13).get().getBookId()).get().getAuthorId());
+        Optional<Author> author = authorService.singleAuthor(bookAuthorService.singleAuthor(bookService.singleBookByISBN(isbn13).get().getBookId()).get().get(0).getAuthorId());
 
         DTO dto = new DTO();
         dto.setBook(book);
@@ -53,12 +53,13 @@ public class LibraryController {
     }
 
     public ResponseEntity<Optional<Author>> getSingleAuthor(@PathVariable Integer bookId){
-        return new ResponseEntity<Optional<Author>>(authorService.singleAuthor(bookAuthorService.singleAuthor(bookId).get().getAuthorId()),HttpStatus.OK);
+        return new ResponseEntity<Optional<Author>>(authorService.singleAuthor(bookAuthorService.singleAuthor(bookId).get().get(0).getAuthorId()),HttpStatus.OK);
     }
     @GetMapping("/books")
     public ResponseEntity<List<Book>> getAllBooks(){
         return new ResponseEntity<List<Book>>(bookService.allBooks(), HttpStatus.OK);
     }
+
 
     @GetMapping("/customer/{customer_id}")
     public ResponseEntity<Optional<Customer>> getSingleCustomer(@PathVariable Integer customer_id){
