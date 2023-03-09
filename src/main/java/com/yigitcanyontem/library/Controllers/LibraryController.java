@@ -4,6 +4,7 @@ import com.yigitcanyontem.library.Entities.Author;
 import com.yigitcanyontem.library.Entities.Book;
 import com.yigitcanyontem.library.Entities.Book_Author;
 import com.yigitcanyontem.library.Entities.Customer;
+import com.yigitcanyontem.library.Repository.CustomerRepository;
 import com.yigitcanyontem.library.Services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,9 @@ public class LibraryController {
 
     @Autowired
     private Book_AuthorService bookAuthorService;
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @GetMapping("/books/id/{bookId}")
     public ResponseEntity<List<DTO>> getSingleBookById(@PathVariable Integer bookId){
@@ -60,6 +64,14 @@ public class LibraryController {
         return new ResponseEntity<List<Book>>(bookService.allBooks(), HttpStatus.OK);
     }
 
+    @PostMapping("/customer/new")
+    public String newCustomer(@ModelAttribute Customer customer){
+        System.out.println(customer.toString());
+
+        customerRepository.save(customer);
+
+        return "Customer Added";
+    }
 
     @GetMapping("/customer/{customer_id}")
     public ResponseEntity<Optional<Customer>> getSingleCustomer(@PathVariable Integer customer_id){
