@@ -19,7 +19,7 @@ public class PublisherService{
         return publisherRepository.findAll();
     }
 
-    public Optional<Publisher> singlePublisher(Integer publisher_id){
+    public Publisher singlePublisher(Integer publisher_id){
         return publisherRepository.findPublisherByPublisherId(publisher_id);
     }
 

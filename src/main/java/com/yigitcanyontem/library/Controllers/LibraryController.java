@@ -1,10 +1,8 @@
 package com.yigitcanyontem.library.Controllers;
 
 import com.yigitcanyontem.library.DTO.DTO;
-import com.yigitcanyontem.library.Entities.Author;
-import com.yigitcanyontem.library.Entities.Book;
-import com.yigitcanyontem.library.Entities.Customer;
-import com.yigitcanyontem.library.Repository.CustomerRepository;
+import com.yigitcanyontem.library.Entities.*;
+import com.yigitcanyontem.library.Repository.*;
 import com.yigitcanyontem.library.Services.*;
 import org.hibernate.annotations.OrderBy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +33,17 @@ public class LibraryController {
 
     @Autowired
     private CustomerRepository customerRepository;
+    @Autowired
+    private BookRepository bookRepository;
 
+    @Autowired
+    private BookLanguageRepository bookLanguageRepository;
+
+    @Autowired
+    private AuthorRepository authorRepository;
+
+    @Autowired
+    private Book_AuthorRepository bookAuthorRepository;
 
     @GetMapping("/books/id/{bookId}")
     public ResponseEntity<List<DTO>> getSingleBookById(@PathVariable Integer bookId){
@@ -122,16 +130,51 @@ public class LibraryController {
         return new ResponseEntity<List<Customer>>(customerRepository.findAll(), HttpStatus.OK);
     }
 
+    @GetMapping("/publishers")
+    public ResponseEntity<List<Publisher>> getAllPublishers(){
+        return new ResponseEntity<List<Publisher>>(publisherService.allPublishers(), HttpStatus.OK);
+    }
+
+    @GetMapping("/languages")
+    public ResponseEntity<List<Book_Language>> getAllLanguages(){
+        return new ResponseEntity<List<Book_Language>>(bookLanguageRepository.findAll(), HttpStatus.OK);
+    }
     @PostMapping("/customer/new")
     public String newCustomer(@RequestBody Customer customer){
-        customer.setCustomerId(customerRepository.maxCustomerId());
+        customer.setCustomerId(customerRepository.maxCustomerId()+1);
         customerRepository.save(customer);
         return "Customer Added";
+    }
+
+    @PostMapping("/books/new")
+    public String newBook(@RequestBody BookModel bookModel){
+        Book book = new Book();
+        book.setBookId(bookRepository.maxBookId()+1);
+        book.setTitle(bookModel.getTitle());
+        book.setIsbn13(bookModel.getIsbn13());
+        book.setNumPages(bookModel.getNumPages());
+        book.setPublicationDate(bookModel.getPublicationDate());
+        book.setBookLanguage(bookLanguageRepository.getReferenceById(Integer.valueOf(bookModel.getLanguage_id())));
+        book.setPublisher(publisherService.singlePublisher(Integer.valueOf(bookModel.getPublisher_id())));
+        bookRepository.save(book);
+
+        Author author = new Author(authorRepository.maxAuthorId()+1, bookModel.getAuthorName());
+        authorRepository.save(author);
+
+        Book_Author book_author = new Book_Author(authorRepository.maxAuthorId(),book);
+        bookAuthorRepository.save(book_author);
+
+        return "Book Added";
     }
 
     @GetMapping("/customer/{customer_id}")
     public ResponseEntity<Optional<Customer>> getSingleCustomer(@PathVariable Integer customer_id){
         return new ResponseEntity<Optional<Customer>>(customerService.singleCustomerByID(customer_id), HttpStatus.OK);
+    }
+
+    @GetMapping("/books/max")
+    public List<Integer> getNextId(){
+        return List.of(bookRepository.maxBookId());
     }
 
     @PutMapping("/books/bookid={bookId}/customerid={customerId}")
