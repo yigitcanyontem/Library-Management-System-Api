@@ -1,4 +1,4 @@
-package com.yigitcanyontem.library.Controllers;
+package com.yigitcanyontem.library.DTO;
 
 import com.yigitcanyontem.library.Entities.Author;
 import com.yigitcanyontem.library.Entities.Book;

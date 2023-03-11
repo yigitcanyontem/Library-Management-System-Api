@@ -18,4 +18,8 @@ public class Book_AuthorService {
     public Optional<List<Book_Author>> singleAuthor(Integer bookId){
         return bookAuthorRepository.findAuthorByBook_BookId(bookId);
     }
+
+    public void deleteBA(Integer bookId){
+        bookAuthorRepository.deleteBook(bookId);
+    }
 }

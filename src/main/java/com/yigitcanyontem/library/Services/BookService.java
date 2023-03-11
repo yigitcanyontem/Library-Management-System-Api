@@ -38,4 +38,8 @@ public class BookService {
     public Integer assignCustomer(Integer bookId, Integer customerId){
         return bookRepository.assignCustomer(bookId,customerId);
     }
+
+    public void deleteBook(Integer book_id){
+        bookRepository.deleteById(book_id);
+    }
 }

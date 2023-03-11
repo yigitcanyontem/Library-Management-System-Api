@@ -19,6 +19,11 @@ public interface BookRepository extends JpaRepository<Book,Integer> {
     @Transactional
     @Query("UPDATE Book b SET b.customer.customerId = :customerId WHERE b.bookId = :bookId")
     Integer assignCustomer(Integer bookId, Integer customerId);
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Book b WHERE b.bookId = :bookId")
+    void deleteBookBook(Integer bookId);
 
-
+    @Query("SELECT max(b.bookId) FROM Book b")
+    int maxBookId();
 }
