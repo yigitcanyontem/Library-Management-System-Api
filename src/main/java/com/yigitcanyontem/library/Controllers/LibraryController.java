@@ -27,24 +27,21 @@ public class LibraryController {
     private CustomerService customerService;
     @Autowired
     private PublisherService publisherService;
-
     @Autowired
     private Book_AuthorService bookAuthorService;
-
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
     private BookRepository bookRepository;
-
     @Autowired
     private BookLanguageRepository bookLanguageRepository;
-
     @Autowired
     private AuthorRepository authorRepository;
-
     @Autowired
     private Book_AuthorRepository bookAuthorRepository;
 
+
+    //GetMappings
     @GetMapping("/books/id/{bookId}")
     public ResponseEntity<List<DTO>> getSingleBookById(@PathVariable Integer bookId){
         DTO dto = new DTO();
@@ -67,7 +64,6 @@ public class LibraryController {
         }
         return null;
     }
-
     @GetMapping("/books/isbn/{isbn13}")
     public ResponseEntity<List<DTO>> getSingleBookByISBN(@PathVariable String isbn13){
         DTO dto = new DTO();
@@ -86,11 +82,6 @@ public class LibraryController {
 
 
     }
-
-    public ResponseEntity<Optional<Author>> getSingleAuthor(@PathVariable Integer bookId){
-        return new ResponseEntity<Optional<Author>>(authorService.singleAuthor(bookAuthorService.singleAuthor(bookId).get().get(0).getAuthorId()),HttpStatus.OK);
-    }
-
     @GetMapping("/books")
     public ResponseEntity<List<DTO>> getAllBooks(){
         List<DTO> dtoList = new ArrayList<>();
@@ -123,29 +114,41 @@ public class LibraryController {
         }
         return new ResponseEntity<List<DTO>>(dtoList, HttpStatus.OK);
     }
-
-
     @GetMapping("/customers")
     public ResponseEntity<List<Customer>> getAllCustomers(){
         return new ResponseEntity<List<Customer>>(customerRepository.findAll(), HttpStatus.OK);
     }
-
     @GetMapping("/publishers")
     public ResponseEntity<List<Publisher>> getAllPublishers(){
         return new ResponseEntity<List<Publisher>>(publisherService.allPublishers(), HttpStatus.OK);
     }
-
     @GetMapping("/languages")
     public ResponseEntity<List<Book_Language>> getAllLanguages(){
         return new ResponseEntity<List<Book_Language>>(bookLanguageRepository.findAll(), HttpStatus.OK);
     }
+    @GetMapping("/customer/{customer_id}")
+    public ResponseEntity<List<Optional<Customer>>> getSingleCustomer(@PathVariable Integer customer_id){
+        Optional<Customer> customer = customerService.singleCustomerByID(customer_id);
+        return new ResponseEntity<>(List.of(customer), HttpStatus.OK);
+    }
+    @GetMapping("/books/max")
+    public List<Integer> getNextId(){
+        return List.of(bookRepository.maxBookId());
+    }
+    @GetMapping("/books/customer/{customer_id}")
+    public List<Book> findBooksByCustomer(@PathVariable Integer customer_id){
+        Customer customer = customerService.singleCustomerByID(customer_id).orElseThrow();
+        return bookRepository.findBooksByCustomer(customer);
+    }
+
+
+    //Post Mappings
     @PostMapping("/customer/new")
     public String newCustomer(@RequestBody Customer customer){
         customer.setCustomerId(customerRepository.maxCustomerId()+1);
         customerRepository.save(customer);
         return "Customer Added";
     }
-
     @PostMapping("/books/new")
     public String newBook(@RequestBody BookModel bookModel){
         Book book = new Book();
@@ -167,21 +170,21 @@ public class LibraryController {
         return "Book Added";
     }
 
-    @GetMapping("/customer/{customer_id}")
-    public ResponseEntity<Optional<Customer>> getSingleCustomer(@PathVariable Integer customer_id){
-        return new ResponseEntity<Optional<Customer>>(customerService.singleCustomerByID(customer_id), HttpStatus.OK);
+
+    //PutMappings
+    @PutMapping("/books/assignbook")
+    public String assignCustomer(@RequestBody AssignModel assignModel){
+        System.out.println(assignModel);
+        return bookService.assignCustomer(assignModel.getBookId(),assignModel.getCustomerId())  +" Customer Assigned";
     }
 
-    @GetMapping("/books/max")
-    public List<Integer> getNextId(){
-        return List.of(bookRepository.maxBookId());
+    @PutMapping("/books/return")
+    public String returnBook(@RequestBody AssignModel assignModel){
+        System.out.println(assignModel);
+        return bookService.assignCustomer(assignModel.getBookId(),assignModel.getCustomerId())  +" Customer Assigned";
     }
 
-    @PutMapping("/books/bookid={bookId}/customerid={customerId}")
-    public String assignCustomer(@PathVariable Integer bookId,@PathVariable Integer customerId){
-        return bookService.assignCustomer(bookId,customerId)+" Customer Assigned";
-    }
-
+    //DeleteMappings
     @DeleteMapping("/books/id/{bookId}")
     void deleteBook(@PathVariable Integer bookId){
         try {
@@ -191,6 +194,20 @@ public class LibraryController {
             throw new RuntimeException(e);
         }
 
+    }
+
+    @DeleteMapping("/customer/delete/{customerId}")
+    void deleteCustomer(@PathVariable Integer customerId){
+        try {
+            customerRepository.deleteById(customerId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public ResponseEntity<Optional<Author>> getSingleAuthor(@PathVariable Integer bookId){
+        return new ResponseEntity<Optional<Author>>(authorService.singleAuthor(bookAuthorService.singleAuthor(bookId).get().get(0).getAuthorId()),HttpStatus.OK);
     }
 
 }
